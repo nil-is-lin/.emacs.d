@@ -1,0 +1,235 @@
+#+author: 李林
+#+email: 1264747292@qq.com
+
+* 系统设置
+** 主题设置[fn:1]
+   1. atom-dark
+      #+BEGIN_SRC emacs-lisp
+	(use-package atom-dark
+	  :ensure t
+	  :init
+	  (load-theme 'atom-dark t)
+	  )
+      #+END_SRC
+   2. org-beautify
+      #+BEGIN_SRC emacs-lisp
+	(use-package org-beautify
+	  :ensure t
+	  :init
+	  (load-theme 'org-beautify t)
+	  )
+      #+END_SRC
+
+** 启动设置
+   1. 取消启动画面（默认是开启）
+      #+BEGIN_SRC emacs-lisp
+	(setq inhibit-startup-screen nil)
+	(setq inhibit-startup-message t)
+      #+END_SRC
+   2. 默认显示行号
+      #+BEGIN_SRC emacs-lisp
+       (global-linum-mode t) 
+      #+END_SRC
+   3. 默认最大列数
+      #+BEGIN_SRC emacs-lisp
+	(setq default-fill-column 70)
+      #+END_SRC
+   4. 显示括号匹配
+      #+BEGIN_SRC emacs-lisp
+	(show-paren-mode t)
+      #+END_SRC
+   5. 不显示工具栏（新版emacs中不能用nil，必须用 0 ）
+      #+BEGIN_SRC emacs-lisp
+	(tool-bar-mode 0)
+	(menu-bar-mode 0)
+	(scroll-bar-mode 0)
+      #+END_SRC
+    
+** *scratch* buffer
+   1. 设置 *scratch* buffer 的 major-mode（默认为 lisp-interaction-mode）
+      #+BEGIN_SRC emacs-lisp
+	(setq initial-major-mode 'lisp-interaction-mode)
+      #+END_SRC
+
+   2. 设置 *scratch* buffer 的初始内容
+      #+BEGIN_SRC emacs-lisp
+	(setq initial-scratch-message "\#这个缓冲区的内容不被保存，且处于lisp模式.\n\n")
+      #+END_SRC
+
+** 用户信息
+   1. 邮箱地址
+      #+BEGIN_SRC emacs-lisp
+	(setq user-mail-address "1264747292@qq.com")
+      #+END_SRC
+   2. 姓名
+      #+BEGIN_SRC emacs-lisp
+	(setq user-full-name "李林")
+      #+END_SRC
+
+* TODO org 
+** 代码高亮
+   #+BEGIN_SRC emacs-lisp
+     (setq org-src-fontify-natively t)
+   #+END_SRC
+
+** 字体配置
+*** 激活 chinese-fonts-setup 包
+    #+BEGIN_SRC emacs-lisp
+      (require 'chinese-fonts-setup)
+    #+END_SRC
+
+** org-babel 配置
+*** 基本配置
+    1. 避免每次执行code block前都需要输入yes
+       #+BEGIN_SRC emacs-lisp
+       (setq org-confirm-babel-evaluate nil)
+       #+END_SRC
+    2. 导出代码块儿的执行结果
+       #+BEGIN_SRC emacs-lisp
+      (setq org-export-babel-evaluate t)
+       #+END_SRC
+    
+*** 语言支持
+**** shell 支持
+     #+BEGIN_SRC emacs-lisp
+	 (org-babel-do-load-languages
+	  'org-babel-load-languages
+	  '((shell . t)
+	    ))
+     #+END_SRC
+
+**** latex 支持
+     1. 将 latex 添加到路径
+	#+BEGIN_SRC emacs-lisp
+	  (setenv "PATH" 
+		  (concat (getenv "PATH") 
+			  ":/Library/TeX/texbin/"	;latex
+			  ))
+	  (setq exec-path 
+		(append exec-path
+			'("/Library/TeX/texbin")
+			))
+	#+END_SRC
+     2. 激活 org-latex
+	#+BEGIN_SRC emacs-lisp
+	  ;; (require 'org-latex)
+	#+END_SRC
+     3. 使用 xelatex 生成 PDF
+	#+BEGIN_SRC emacs-lisp
+
+	#+END_SRC
+     4. org-mode 使用 cdlatex
+	#+BEGIN_SRC emacs-lisp
+	  (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
+	#+END_SRC
+     5. Auctex(melpa安装，忽略前两行激活，因为有 (package-initialize))
+	1) 激活
+	   #+BEGIN_SRC emacs-lisp
+	     ; (load "auctex.el" nil t t)
+	     ; (load "preview.el" nil t t)
+	   #+END_SRC
+
+	2) 支持其它 LaTeX 包
+       	   #+BEGIN_SRC emacs-lisp
+	  (setq Tex-auto-save t)
+	  (setq Tex-parse-self t)
+	   #+END_SRC
+
+	3) 使用 \include 或者 \input
+	   #+BEGIN_SRC emacs-lisp
+	     (setq-default Tex-master nil)
+	   #+END_SRC
+
+	4) 语法高亮
+	   #+BEGIN_SRC emacs-lisp
+	     (setq global-font-lock-mode t)
+	   #+END_SRC
+
+     6. latex 导出
+	#+BEGIN_SRC emacs-lisp
+       
+	#+END_SRC
+     7. beamer 导出
+	#+BEGIN_SRC emacs-lisp
+	  (eval-after-load "ox-latex"
+	    '(add-to-list 'org-latex-classes
+			  `("beamer"
+			    ,(concat "\\documentclass[presentation]{beamer}\n"
+				     "[DEFAULT-PACKAGES]"
+				     "[PACKAGES]"
+				     "[EXTRA]\n")
+			    ("\\section{%s}" . "\\section*{%s}")
+			    ("\\subsection{%s}" . "\\subsection*{%s}")
+			    ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
+	#+END_SRC
+
+**** markdown 支持
+     1. 导出
+     #+BEGIN_SRC emacs-lisp
+       (eval-after-load "org"
+	 '(require 'ox-md nil t))
+     #+END_SRC
+
+**** python 支持
+**** julia 支持
+     #+BEGIN_SRC emacs-lisp
+       (require 'ess-site)
+       (setq inferior-julia-program-name "/usr/local/bin/julia")
+      
+       (add-hook 'org-babel-after-execute-hook 'org-display-inline-images)   
+       (add-hook 'org-mode-hook 'org-display-inline-images)
+       (add-to-list 'load-path "~/.emacs.d/lisp/")
+       (require 'ob-julia)
+       (load "~/.emacs.d/lisp/ob-julia.el")
+     #+END_SRC
+
+** Jekyll 博客[fn:2]
+   1. 安装 Jekyll
+   2. 配置 org 导出 html
+      #+BEGIN_SRC emacs-lisp
+	(setq org-publish-project-alist
+	      '(("org-ianbarton"
+		 ;; Path to your org files.
+		 :base-directory "~/gitSpace/nil-is-lin.github.io/.org-source/"
+		 :base-extension "org"
+
+		 ;; Path to your Jekyll project.
+		 :publishing-directory "~/gitSpace/nil-is-lin.github.io/_post/"
+		 :recursive t
+		 :publishing-function org-publish-org-to-html
+		 :headline-levels 4 
+		 :html-extension "html"
+		 :body-only t ;; Only export section between <body> </body>
+		 )
+
+		("org-static-ian"
+		 :base-directory "~/gitSpace/nil-is-lin.github.io/.org-source/"
+		 :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|php"
+		 :publishing-directory "~/gitSpace/nil-is-lin.github.io/_post/"
+		 :recursive t
+		 :publishing-function org-publish-attachment)
+
+		("ian" :components ("org-ianbarton" "org-static-ian"))
+		))
+      #+END_SRC
+   3. 新建 org 发布
+      
+
+* TODO git
+  1. magit[fn:3]
+     #+BEGIN_SRC emacs-lisp
+       (use-package magit
+	 :ensure t
+	 :bind ("C-x g" . magit-status))
+     #+END_SRC
+
+* TODO 拼写检查
+  1. 
+* Footnotes
+
+[fn:3] [[https://magit.vc/manual/magit.html#Getting-Started][Magit User Manual]]
+
+[fn:2] [[http://orgmode.org/worg/org-tutorials/org-jekyll.html][在 Jekyll 生成的博客中使用 org]]
+
+[fn:1] 如果是使用 ~(load-theme 'solarized-light)~ , emacs 启动后会要求确认，而使用
+～(load-theme 'solarized-light t)～ 则是 load-theme 的无需确认模式。
